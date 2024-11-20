@@ -12,6 +12,8 @@ const allowedOrigins = [
   'https://ketal.paquet.fun',
   'http://www.ketal.paquet.fun',
   'https://www.ketal.paquet.fun',
+  'http://ketal-online.github.io',
+  'https://ketal-online.github.io',
   'http://79.137.35.181',
   'https://79.137.35.181'
 ];

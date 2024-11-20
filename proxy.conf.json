@@ -13,6 +13,14 @@
       "secure": false
     },
     {
+      "target": "http://ketal-online.github.io",
+      "secure": false
+    },
+    {
+      "target": "https://ketal-online.github.io",
+      "secure": false
+    },
+    {
       "target": "http://ketal.paquet.fun",
       "secure": false
     },
