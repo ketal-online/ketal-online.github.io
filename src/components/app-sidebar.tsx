@@ -1,4 +1,6 @@
 import * as React from "react"
+import { Link } from "react-router-dom"
+import { useAuth } from "@/hooks/use-auth"
 
 import {
   Sidebar,
@@ -12,7 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { LucideBeer, LucideLanguages, LucideSunMoon, LucideUsersRound } from "lucide-react"
+import { LucideBeer, LucideLanguages, LucideSunMoon, LucideUsersRound, LogIn, LogOut, UserPlus } from "lucide-react"
 
 const mainItems = [
   {
@@ -36,6 +38,8 @@ const footerItems = [
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user, signOut } = useAuth()
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -45,10 +49,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <Link to="/">
                 <LucideBeer className="!size-5" />
                 <span className="text-base font-semibold">Ketal Guinze Making</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -70,6 +74,47 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarGroup>
+          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {user ? (
+                <>
+                  <SidebarMenuItem>
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground truncate">
+                      {user.email}
+                    </div>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton onClick={() => signOut()}>
+                      <LogOut />
+                      <span>Logout</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </>
+              ) : (
+                <>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/login">
+                        <LogIn />
+                        <span>Login</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/signup">
+                        <UserPlus />
+                        <span>Sign Up</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </>
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Settings</SidebarGroupLabel>
           <SidebarGroupContent>
