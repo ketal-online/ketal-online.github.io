@@ -1,6 +1,8 @@
 import * as React from "react"
 import { Link } from "react-router-dom"
 import { useAuth } from "@/hooks/use-auth"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { getAvatarUrl } from "@/lib/dicebear"
 
 import {
   Sidebar,
@@ -81,8 +83,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {user ? (
                 <>
                   <SidebarMenuItem>
-                    <div className="px-2 py-1.5 text-sm text-muted-foreground truncate">
-                      {user.email}
+                    <div className="flex items-center gap-2 px-2 py-1.5">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={getAvatarUrl(user.user_metadata?.full_name || user.email || user.id)} alt={user.email || "User"} />
+                        <AvatarFallback>{user.email?.slice(0, 2).toUpperCase() || "U"}</AvatarFallback>
+                      </Avatar>
+                      <div className="text-sm text-muted-foreground truncate">
+                        {user.user_metadata?.full_name || user.email}
+                      </div>
                     </div>
                   </SidebarMenuItem>
                   <SidebarMenuItem>

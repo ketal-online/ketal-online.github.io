@@ -24,10 +24,11 @@ export function useGameRoom(roomId: string, userName: string) {
   const [peers, setPeers] = useState<Peer[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const roomRef = useRef<ReturnType<typeof joinRoom> | null>(null)
+  const sendNameRef = useRef<((name: string, target?: string | string[]) => void) | null>(null)
   const [sendMessageAction, setSendMessageAction] = useState<((data: Omit<Message, 'id' | 'senderId'>, target?: string | string[]) => void) | null>(null)
 
   useEffect(() => {
-    if (!roomId || !userName) return
+    if (!roomId) return
 
     // Join the room
     const room = joinRoom(config, roomId)
@@ -35,6 +36,7 @@ export function useGameRoom(roomId: string, userName: string) {
 
     // Handle peers joining
     const [sendName, getName] = room.makeAction<string>('name')
+    sendNameRef.current = sendName
     
     room.onPeerJoin((peerId) => {
       console.log('Peer joined:', peerId)
@@ -69,11 +71,26 @@ export function useGameRoom(roomId: string, userName: string) {
       setMessages(prev => [...prev, newMessage])
     })
 
+    // Initial broadcast of name (in case we are joining an existing room)
+    // Wait a bit for connection? Trystero handles this usually via onPeerJoin for others.
+    // But for existing peers, we might want to announce ourselves?
+    // Trystero's joinRoom doesn't give a list of existing peers immediately.
+    // Usually existing peers will see us join and we will see them join (or they are already there).
+    // If they are already there, onPeerJoin fires for them? No, onPeerJoin fires when *someone else* joins.
+    // Trystero is mesh.
+    
     return () => {
       room.leave()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId]) // Re-run if roomId changes. userName change shouldn't trigger reconnect ideally, but for now it's fine.
+  }, [roomId]) // Re-run if roomId changes.
+
+  // Broadcast name change
+  useEffect(() => {
+    if (sendNameRef.current && userName) {
+      sendNameRef.current(userName)
+    }
+  }, [userName])
 
   const sendMessage = (text: string) => {
     if (!sendMessageAction) return

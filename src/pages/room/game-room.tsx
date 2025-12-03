@@ -3,12 +3,14 @@ import { useParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/use-auth'
 import { useGameRoom } from '@/hooks/use-game-room'
+import { getAvatarUrl } from '@/lib/dicebear'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import { MessageSquare, Send, Users, Smile } from 'lucide-react'
+import { MessageSquare, Send, Users, Smile, Edit2, Check, X } from 'lucide-react'
 import EmojiPicker, { type EmojiClickData } from 'emoji-picker-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
@@ -21,18 +23,54 @@ type RoomDetails = {
 
 export default function GameRoomPage() {
   const { roomId } = useParams<{ roomId: string }>()
-  const { user } = useAuth()
+  const { user, updateProfile } = useAuth()
   const [roomDetails, setRoomDetails] = useState<RoomDetails | null>(null)
   const [passwordInput, setPasswordInput] = useState('')
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [loading, setLoading] = useState(true)
   const [chatInput, setChatInput] = useState('')
+  
+  // Name editing state
+  const [displayName, setDisplayName] = useState('')
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [tempName, setTempName] = useState('')
+
+  useEffect(() => {
+    if (user?.user_metadata?.full_name) {
+      setDisplayName(user.user_metadata.full_name)
+    } else if (user?.email) {
+      setDisplayName(user.email.split('@')[0])
+    } else {
+      setDisplayName('Guest')
+    }
+  }, [user])
 
   // We only initialize Trystero if authorized
   const { peers, messages, sendMessage } = useGameRoom(
     isAuthorized && roomId ? roomId : '',
-    user?.email?.split('@')[0] || 'Guest' // Simple username derivation
+    displayName
   )
+
+  const handleNameSave = async () => {
+    if (!tempName.trim()) return
+    
+    setDisplayName(tempName)
+    setIsEditingName(false)
+
+    if (user) {
+      try {
+        await updateProfile({ full_name: tempName })
+      } catch (error) {
+        console.error('Failed to update profile name:', error)
+        // Optionally revert or show error
+      }
+    }
+  }
+
+  const startEditingName = () => {
+    setTempName(displayName)
+    setIsEditingName(true)
+  }
 
   useEffect(() => {
     if (!roomId) return
@@ -127,10 +165,53 @@ export default function GameRoomPage() {
               <p>Waiting for players...</p>
               <div className="mt-4">
                 <h3 className="font-semibold mb-2">Peers:</h3>
-                <ul className="list-disc pl-5">
-                  <li>Me ({user?.email?.split('@')[0] || 'Guest'})</li>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={getAvatarUrl(displayName)} />
+                      <AvatarFallback>ME</AvatarFallback>
+                    </Avatar>
+                    {isEditingName ? (
+                      <div className="flex items-center gap-1">
+                        <Input 
+                          value={tempName} 
+                          onChange={(e) => setTempName(e.target.value)}
+                          className="h-7 w-32 text-sm"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleNameSave()
+                            if (e.key === 'Escape') setIsEditingName(false)
+                          }}
+                        />
+                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleNameSave}>
+                          <Check className="h-3 w-3" />
+                        </Button>
+                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setIsEditingName(false)}>
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 group">
+                        <span>{displayName} (Me)</span>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" 
+                          onClick={startEditingName}
+                        >
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </li>
                   {peers.map(p => (
-                    <li key={p.id}>{p.name}</li>
+                    <li key={p.id} className="flex items-center gap-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={getAvatarUrl(p.name)} />
+                        <AvatarFallback>{p.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <span>{p.name}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -148,8 +229,14 @@ export default function GameRoomPage() {
           <div className="space-y-4">
             {messages.map(msg => (
               <div key={msg.id} className={`flex flex-col ${msg.senderId === 'me' ? 'items-end' : 'items-start'}`}>
-                <div className={`max-w-[80%] rounded-lg p-2 text-sm ${msg.senderId === 'me' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                  {msg.text}
+                <div className={`flex gap-2 ${msg.senderId === 'me' ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={getAvatarUrl(msg.senderName)} />
+                    <AvatarFallback>{msg.senderName.slice(0, 1).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className={`max-w-[80%] rounded-lg p-2 text-sm ${msg.senderId === 'me' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                    {msg.text}
+                  </div>
                 </div>
                 <span className="text-xs text-muted-foreground mt-1">{msg.senderName}</span>
               </div>
@@ -198,8 +285,14 @@ export default function GameRoomPage() {
               <div className="space-y-4">
                 {messages.map(msg => (
                   <div key={msg.id} className={`flex flex-col ${msg.senderId === 'me' ? 'items-end' : 'items-start'}`}>
-                    <div className={`max-w-[80%] rounded-lg p-2 text-sm ${msg.senderId === 'me' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                      {msg.text}
+                    <div className={`flex gap-2 ${msg.senderId === 'me' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={getAvatarUrl(msg.senderName)} />
+                        <AvatarFallback>{msg.senderName.slice(0, 1).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <div className={`max-w-[80%] rounded-lg p-2 text-sm ${msg.senderId === 'me' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                        {msg.text}
+                      </div>
                     </div>
                     <span className="text-xs text-muted-foreground mt-1">{msg.senderName}</span>
                   </div>

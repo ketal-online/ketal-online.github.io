@@ -6,6 +6,7 @@ export type AuthContextType = {
   user: User | null
   loading: boolean
   signOut: () => Promise<void>
+  updateProfile: (data: { full_name?: string }) => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
