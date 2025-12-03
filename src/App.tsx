@@ -5,6 +5,8 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AuthProvider } from '@/components/auth-provider'
 import LoginPage from '@/pages/login'
 import SignupPage from '@/pages/signup'
+import NewRoomPage from '@/pages/room/new-room'
+import GameRoomPage from '@/pages/room/game-room'
 import './App.css'
 
 function App() {
@@ -33,6 +35,8 @@ function App() {
                   } />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/room/new" element={<NewRoomPage />} />
+                  <Route path="/room/:roomId" element={<GameRoomPage />} />
                 </Routes>
               </div>
             </div>
