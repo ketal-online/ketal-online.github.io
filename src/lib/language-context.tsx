@@ -44,6 +44,9 @@ const translations: Translations = {
   'room.loading': { en: 'Loading room...', fr: 'Chargement du salon...' },
   'room.enter_password': { en: 'Enter Room Password', fr: 'Entrer le mot de passe' },
   'room.join_room': { en: 'Join Room', fr: 'Rejoindre le salon' },
+  'room.waiting_for_players': { en: 'Waiting for players...', fr: 'En attente de joueurs...' },
+  'room.share_link_hint': { en: 'Share this link with your friends to start playing.', fr: 'Partagez ce lien avec vos amis pour commencer à jouer.' },
+  'room.listening_for_peers': { en: 'Listening for peers...', fr: 'Recherche de pairs...' },
   'room.game_board': { en: 'Game Board', fr: 'Plateau de jeu' },
   'room.game_content': { en: 'Game content will appear here', fr: 'Le contenu du jeu apparaîtra ici' },
   
