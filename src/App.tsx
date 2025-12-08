@@ -1,46 +1,35 @@
-import { Routes, Route } from 'react-router-dom'
-import { AppSidebar } from '@/components/app-sidebar'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { SiteHeader } from '@/components/site-header'
-import { SidebarProvider } from '@/components/ui/sidebar'
 import { AuthProvider } from '@/components/auth-provider'
-import { LayoutProvider } from '@/lib/layout-context'
-import LoginPage from '@/pages/login'
-import SignupPage from '@/pages/signup'
+import { ThemeProvider } from '@/lib/theme-context'
+import { LanguageProvider } from '@/lib/language-context'
+import { Toaster } from '@/components/ui/sonner'
 import NewRoomPage from '@/pages/room/new-room'
 import GameRoomPage from '@/pages/room/game-room'
 import './App.css'
 
 function App() {
   return (
-    <AuthProvider>
-      <LayoutProvider>
-        <SidebarProvider
-          style={
-            {
-              "--header-height": "3.5rem",
-            } as React.CSSProperties
-          }
-          className="pt-[var(--header-height)]"
-        >
-          <SiteHeader />
-          <AppSidebar />
-          <main className="flex flex-1 flex-col min-h-[calc(100vh-var(--header-height))] transition-[margin] duration-300 ease-in-out">
-            <div className="flex flex-1 flex-col">
-              <div className="@container/main flex flex-1 flex-col gap-2">
-                <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                  <Routes>
-                    <Route path="/" element={<NewRoomPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/signup" element={<SignupPage />} />
-                    <Route path="/room/:roomId" element={<GameRoomPage />} />
-                  </Routes>
-                </div>
-              </div>
-            </div>
-          </main>
-        </SidebarProvider>
-      </LayoutProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <div className="min-h-screen bg-background">
+            <SiteHeader />
+            <main className="pt-[var(--header-height)]">
+              <Routes>
+                <Route path="/" element={<NewRoomPage />} />
+                <Route path="/room/:roomSlug" element={<GameRoomPage />} />
+                {/* Redirect login, signup, and invalid routes to home */}
+                <Route path="/login" element={<Navigate to="/" replace />} />
+                <Route path="/signup" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </main>
+            <Toaster position="top-right" offset="calc(var(--header-height) + 8px)" />
+          </div>
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   )
 }
 

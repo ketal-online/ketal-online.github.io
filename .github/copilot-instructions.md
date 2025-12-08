@@ -6,7 +6,7 @@
   - Design must be mobile-responsive (e.g., Sidebar on desktop, Sheet/Drawer on mobile).
 - **Routing**: Use `HashRouter` exclusively (compatibility with GitHub Pages).
 - **Backend**: Supabase (using `@supabase/supabase-js`).
-- **P2P/Multiplayer**: Trystero (using `trystero/supabase` strategy).
+- **P2P/Multiplayer**: Trystero (using `trystero/nostr` strategy).
 
 # Architecture & Patterns
 - **Authentication**:
