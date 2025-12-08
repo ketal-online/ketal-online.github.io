@@ -60,6 +60,7 @@ const translations: Translations = {
   // Players
   'players.title': { en: 'Players', fr: 'Joueurs' },
   'players.me': { en: 'Me', fr: 'Moi' },
+  'players.name_changed': { en: 'Player {0} is now called {1}', fr: 'Le joueur {0} s\'appelle maintenant {1}' },
   
   // Voice
   'voice.join': { en: 'Voice', fr: 'Vocal' },

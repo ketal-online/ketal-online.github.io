@@ -46,7 +46,7 @@ export default function GameRoomPage() {
   // Name editing state - initialize with a default value immediately
   const [displayName, setDisplayName] = useState(() => {
     // Try to get initial name synchronously
-    return 'Guest'
+    return `Guest${Math.floor(Math.random() * 10000)}`
   })
   const [tempName, setTempName] = useState('')
   

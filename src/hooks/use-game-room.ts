@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { joinRoom, selfId, type Room } from 'trystero/nostr'
 import { supabase } from '@/lib/supabase'
+import { toast } from 'sonner'
+import { useLanguage } from '@/lib/language-context'
 
 // Use a unique app ID for Nostr signaling
 const config = {
@@ -34,6 +36,7 @@ type ChatPayload = {
 }
 
 export function useGameRoom(roomSlug: string, roomDbId: string, userName: string, userId?: string) {
+  const { t } = useLanguage()
   const [peers, setPeers] = useState<Peer[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [connected, setConnected] = useState(false)
@@ -137,6 +140,11 @@ export function useGameRoom(roomSlug: string, roomDbId: string, userName: string
       // Check if we already have this peer's real name (not "Connecting...")
       const existingPeer = peersRef.current.find(p => p.id === peerId)
       const alreadyKnown = existingPeer && existingPeer.name !== 'Connecting...'
+      
+      // Toast on name change
+      if (alreadyKnown && existingPeer.name !== info.name) {
+        toast.info(t('players.name_changed').replace('{0}', existingPeer.name).replace('{1}', info.name))
+      }
       
       // Update peer name
       setPeers(prev => {
