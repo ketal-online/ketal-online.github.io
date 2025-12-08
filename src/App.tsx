@@ -29,17 +29,9 @@ function App() {
               <div className="@container/main flex flex-1 flex-col gap-2">
                 <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                   <Routes>
-                    <Route path="/" element={
-                      <div className="px-4 lg:px-6">
-                        <h1 className="text-2xl font-bold">Welcome to Ketal Online</h1>
-                        <p className="text-muted-foreground">Select a game mode from the sidebar to start.</p>
-                      </div>
-                    } />
-                    
+                    <Route path="/" element={<NewRoomPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
-
-                    <Route path="/room" element={<NewRoomPage />} />
                     <Route path="/room/:roomId" element={<GameRoomPage />} />
                   </Routes>
                 </div>
