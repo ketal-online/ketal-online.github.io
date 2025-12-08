@@ -1,10 +1,14 @@
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { useLayout } from "@/lib/layout-context"
+import { MessageSquare, PanelRight } from "lucide-react"
 
 export function SiteHeader() {
+  const { toggleRightSidebar, showRightSidebarTrigger, rightSidebarOpen } = useLayout()
+
   return (
-    <header className="fixed top-0 left-0 h-(--header-height) w-full flex shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+    <header className="fixed top-0 left-0 z-50 w-full flex shrink-0 items-center gap-2 border-b bg-background h-[var(--header-height)] transition-[width,height] ease-linear">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         <SidebarTrigger className="-ml-1" />
         <Separator

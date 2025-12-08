@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <script>
+      // Redirect /path to /#/path for HashRouter
+      var l = window.location;
+      var path = l.pathname;
+      
+      // Avoid redirecting if already at root or hash
+      if (path && path !== '/' && path !== '/index.html') {
+          l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + '/#' + path + l.search + l.hash
+          );
+      }
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

@@ -20,3 +20,9 @@ create policy "Rooms are viewable by everyone"
 create policy "Users can create rooms"
   on public.rooms for insert
   with check ( auth.uid() = created_by );
+
+-- Allow anonymous users to create rooms (if created_by is null)
+create policy "Anonymous can create rooms"
+  on public.rooms for insert
+  with check ( created_by is null );
+

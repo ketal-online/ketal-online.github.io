@@ -5,6 +5,22 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ketal</title>
+    <script>
+      // Local dev redirect for HashRouter
+      (function() {
+        var path = window.location.pathname;
+        if (path !== '/' && path !== '/index.html' && !path.startsWith('/src/') && !path.startsWith('/@')) {
+           // Check if we are in dev mode (vite usually serves on localhost or 127.0.0.1)
+           // But this script runs in browser.
+           // We want to redirect /foo to /#/foo
+           // But we must avoid redirecting assets.
+           // Simple heuristic: if it has no extension or looks like a route.
+           if (path.indexOf('.') === -1) {
+             window.location.replace('/#' + path + window.location.search + window.location.hash);
+           }
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
