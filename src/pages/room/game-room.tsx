@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/use-auth'
 import { useGameRoom } from '@/hooks/use-game-room'
 import { useVoiceChat } from '@/hooks/use-voice-chat'
+import { useKetalGame } from '@/hooks/use-ketal-game'
 import { useLanguage } from '@/lib/language-context'
 import { getAvatarUrl } from '@/lib/dicebear'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -12,9 +13,10 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { toast } from 'sonner'
-import { MessageSquare, Send, Users, Smile, Edit2, X, Mic, MicOff, Phone, PhoneOff, Loader2 } from 'lucide-react'
+import { MessageSquare, Send, Users, Smile, Edit2, X, Mic, MicOff, Phone, PhoneOff } from 'lucide-react'
 import EmojiPicker, { type EmojiClickData } from 'emoji-picker-react'
 import { cn } from "@/lib/utils"
+import { KetalGame } from '@/components/ketal'
 
 type RoomDetails = {
   id: string
@@ -65,12 +67,23 @@ export default function GameRoomPage() {
   }, [user])
 
   // We only initialize P2P if authorized
-  const { peers, messages, sendMessage, connected } = useGameRoom(
+  const { peers, messages, sendMessage, connected, selfId, createAction } = useGameRoom(
     isAuthorized && roomSlug ? roomSlug : '',
     isAuthorized && roomDetails ? roomDetails.id : '',
     displayName,
     user?.id
   )
+
+  // Ketal game hook
+  const ketalGame = useKetalGame({
+    roomId: roomDetails?.id,
+    peers,
+    selfId,
+    displayName,
+    userId: user?.id,
+    createAction,
+    connected,
+  })
 
   // Voice chat
   const { isMuted, toggleMute, isConnected: voiceConnected, remoteStreams } = useVoiceChat(
@@ -248,41 +261,21 @@ export default function GameRoomPage() {
   return (
     <div className="h-[calc(100vh-var(--header-height))] overflow-hidden relative">
       {/* Main Game Area */}
-      <div className="h-full overflow-auto bg-muted/20 p-4 md:p-6">
-        <Card className="h-full w-full overflow-hidden border-none shadow-none bg-transparent">
-          <CardContent className="flex h-full items-center justify-center p-0">
-            {peers.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-center space-y-6 p-8 animate-in fade-in duration-500">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping" />
-                  <div className="relative bg-background p-6 rounded-full border-2 border-primary/50 shadow-sm">
-                    <Users className="h-10 w-10 text-primary" />
-                  </div>
-                </div>
-                <div className="space-y-2 max-w-md">
-                  <h3 className="text-2xl font-semibold tracking-tight">{t('room.waiting_for_players')}</h3>
-                  <p className="text-muted-foreground">
-                    {t('room.share_link_hint')}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-4 py-2 rounded-full border">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  {t('room.listening_for_peers')}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center">
-                <h3 className="text-lg font-semibold">{t('room.game_board')}</h3>
-                <p className="text-muted-foreground">{t('room.game_content')}</p>
-                {connected && (
-                  <p className="text-sm text-green-600 mt-2">
-                    ● Connected • {peers.length + 1} {t('players.title').toLowerCase()}
-                  </p>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      <div className="h-full overflow-auto bg-muted/20">
+        <KetalGame
+          state={ketalGame.state}
+          selfId={selfId}
+          isHost={ketalGame.isHost}
+          hostId={ketalGame.hostId}
+          lobbyPlayers={ketalGame.lobbyPlayers}
+          deckSupportCount={ketalGame.deckSupportCount}
+          onStartGame={ketalGame.startPhaseOne}
+          onSubmitPrediction={ketalGame.submitPrediction}
+          onDealCard={ketalGame.dealCard}
+          onRevealPyramidCard={ketalGame.revealNextPyramidCard}
+          onAssignSips={ketalGame.assignSips}
+          onResetGame={ketalGame.resetGame}
+        />
       </div>
 
       {/* Chat FAB - single floating button */}

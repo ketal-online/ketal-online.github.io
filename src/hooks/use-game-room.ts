@@ -13,6 +13,7 @@ export type Peer = {
   id: string
   name: string
   isHost: boolean
+  userId?: string
 }
 
 export type Message = {
@@ -27,6 +28,7 @@ export type Message = {
 // Simple payload - just the name, no complex flags needed
 type PeerInfo = {
   name: string
+  userId?: string
 }
 
 type ChatPayload = {
@@ -44,14 +46,21 @@ export function useGameRoom(roomSlug: string, roomDbId: string, userName: string
   // Refs to avoid stale closures
   const roomRef = useRef<Room | null>(null)
   const userNameRef = useRef(userName)
+  const userIdRef = useRef(userId)
   const peersRef = useRef<Peer[]>([]) // Mirror of peers state for use in callbacks
   const sendPeerInfoRef = useRef<((info: PeerInfo, target?: string | string[]) => void) | null>(null)
   const sendChatRef = useRef<((msg: ChatPayload, target?: string | string[]) => void) | null>(null)
+  // Track created actions to avoid duplicates
+  const createdActionsRef = useRef<Map<string, ReturnType<Room['makeAction']>>>(new Map())
   
   // Keep refs updated
   useEffect(() => {
     userNameRef.current = userName
   }, [userName])
+
+  useEffect(() => {
+    userIdRef.current = userId
+  }, [userId])
   
   useEffect(() => {
     peersRef.current = peers
@@ -105,7 +114,7 @@ export function useGameRoom(roomSlug: string, roomDbId: string, userName: string
 
     // Helper: send our info to a specific peer
     const sendMyInfoTo = (targetPeerId: string) => {
-      const info: PeerInfo = { name: userNameRef.current }
+      const info: PeerInfo = { name: userNameRef.current, userId: userIdRef.current }
       console.log('[P2P] Sending my info to', targetPeerId, ':', info)
       sendPeerInfo(info, targetPeerId)
     }
@@ -146,14 +155,14 @@ export function useGameRoom(roomSlug: string, roomDbId: string, userName: string
         toast.info(t('players.name_changed').replace('{0}', existingPeer.name).replace('{1}', info.name))
       }
       
-      // Update peer name
+      // Update peer name and userId
       setPeers(prev => {
         const existing = prev.find(p => p.id === peerId)
         if (existing) {
-          return prev.map(p => p.id === peerId ? { ...p, name: info.name } : p)
+          return prev.map(p => p.id === peerId ? { ...p, name: info.name, userId: info.userId } : p)
         } else {
           // Peer sent info before onPeerJoin fired
-          return [...prev, { id: peerId, name: info.name, isHost: false }]
+          return [...prev, { id: peerId, name: info.name, isHost: false, userId: info.userId }]
         }
       })
       
@@ -191,6 +200,7 @@ export function useGameRoom(roomSlug: string, roomDbId: string, userName: string
       roomRef.current = null
       sendPeerInfoRef.current = null
       sendChatRef.current = null
+      createdActionsRef.current.clear()
       setPeers([])
       setConnected(false)
     }
@@ -202,7 +212,7 @@ export function useGameRoom(roomSlug: string, roomDbId: string, userName: string
     
     console.log('[P2P] Broadcasting name update:', userName)
     // Just send the name update to all peers
-    sendPeerInfoRef.current({ name: userName })
+    sendPeerInfoRef.current({ name: userName, userId: userIdRef.current })
   }, [userName, connected])
 
   // Send message function
@@ -248,12 +258,38 @@ export function useGameRoom(roomSlug: string, roomDbId: string, userName: string
     }
   }, [roomDbId, userId])
 
+  // Create a custom action for game-specific P2P communication
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const createAction = useCallback(<T = any,>(actionName: string) => {
+    if (!roomRef.current) return null
+    
+    // Return existing action if already created
+    const existing = createdActionsRef.current.get(actionName)
+    if (existing) return existing as unknown as [
+      (payload: T, target?: string | string[]) => void,
+      (handler: (payload: T, peerId: string) => void) => void,
+      unknown
+    ]
+    
+    // Create new action - use 'any' to bypass trystero's strict typing
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const action = (roomRef.current as any).makeAction(actionName)
+    createdActionsRef.current.set(actionName, action as unknown as ReturnType<Room['makeAction']>)
+    return action as [
+      (payload: T, target?: string | string[]) => void,
+      (handler: (payload: T, peerId: string) => void) => void,
+      unknown
+    ]
+  }, [])
+
   return {
     peers,
     messages,
     sendMessage,
     connected,
-    selfId // Export selfId for debugging
+    selfId,
+    createAction,
   }
 }
+
 

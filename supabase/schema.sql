@@ -102,11 +102,11 @@ grant execute on function public.cleanup_inactive_anonymous_rooms() to service_r
 -- Enable it via Dashboard > Database > Extensions > pg_cron
 
 -- Uncomment the following once pg_cron is enabled:
--- select cron.schedule(
---   'cleanup-anonymous-rooms',    -- job name
---   '0 * * * *',                  -- every hour at minute 0
---   $$select public.cleanup_inactive_anonymous_rooms()$$
--- );
+select cron.schedule(
+  'cleanup-anonymous-rooms',    -- job name
+  '0 * * * *',                  -- every hour at minute 0
+  $$select public.cleanup_inactive_anonymous_rooms()$$
+);
 
 -- Alternative: You can also call this function from an Edge Function 
 -- triggered by a scheduled task if pg_cron is not available.
@@ -122,3 +122,67 @@ grant execute on function public.cleanup_inactive_anonymous_rooms() to service_r
 -- Then update the cleanup function to use last_activity_at instead of created_at
 -- and update last_activity_at when messages are sent or players join
 
+
+-- ============================================
+-- Drink History for Ketal Game
+-- ============================================
+
+-- Table to store drink history for authenticated users
+create table public.drink_history (
+  id uuid default gen_random_uuid() primary key,
+  room_id uuid references public.rooms(id) on delete cascade not null,
+  session_id text not null, -- game session identifier
+  source_trystero_id text not null, -- P2P peer ID of the source player
+  source_user_id uuid references auth.users(id), -- Supabase user ID (nullable for guests)
+  source_name text not null,
+  target_trystero_id text not null, -- P2P peer ID of the target player
+  target_user_id uuid references auth.users(id), -- Supabase user ID (nullable for guests)
+  target_name text not null,
+  amount integer not null check (amount > 0),
+  direction text not null check (direction in ('drink', 'give')),
+  phase text not null check (phase in ('phase1', 'pyramid')),
+  reason text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Indexes for efficient querying
+create index drink_history_room_id_idx on public.drink_history(room_id);
+create index drink_history_session_id_idx on public.drink_history(session_id);
+create index drink_history_source_user_id_idx on public.drink_history(source_user_id);
+create index drink_history_target_user_id_idx on public.drink_history(target_user_id);
+create index drink_history_created_at_idx on public.drink_history(created_at);
+
+-- Set up Row Level Security (RLS)
+alter table public.drink_history enable row level security;
+
+-- Allow anyone to read drink history
+create policy "Drink history is viewable by everyone"
+  on public.drink_history for select
+  using ( true );
+
+-- Allow anyone to insert drink history (game host inserts for all players)
+create policy "Anyone can insert drink history"
+  on public.drink_history for insert
+  with check ( true );
+
+-- View to get player statistics across all games
+create or replace view public.player_drink_stats as
+select
+  target_user_id as user_id,
+  count(*) as total_drinks,
+  sum(amount) as total_sips_taken,
+  count(distinct session_id) as games_played,
+  max(created_at) as last_played
+from public.drink_history
+where target_user_id is not null and direction in ('drink', 'give')
+group by target_user_id;
+
+-- View to get player giving statistics
+create or replace view public.player_give_stats as
+select
+  source_user_id as user_id,
+  sum(amount) as total_sips_given,
+  count(distinct session_id) as games_played
+from public.drink_history
+where source_user_id is not null and direction = 'give' and source_user_id != target_user_id
+group by source_user_id;

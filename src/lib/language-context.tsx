@@ -96,6 +96,89 @@ const translations: Translations = {
   'common.cancel': { en: 'Cancel', fr: 'Annuler' },
   'common.close': { en: 'Close', fr: 'Fermer' },
   'common.guest': { en: 'Guest', fr: 'Invité' },
+  
+  // Ketal Game
+  'ketal.game_lobby': { en: 'Game Lobby', fr: 'Salon de jeu' },
+  'ketal.waiting_for_players_lobby': { en: 'Waiting for players to join...', fr: 'En attente de joueurs...' },
+  'ketal.players_needed': { en: 'players needed', fr: 'joueurs requis' },
+  'ketal.using_one_deck': { en: 'Using 1 deck of cards', fr: 'Utilisation d\'1 jeu de cartes' },
+  'ketal.using_multiple_decks': { en: 'Using {0} decks of cards', fr: 'Utilisation de {0} jeux de cartes' },
+  'ketal.host': { en: 'Host', fr: 'Hôte' },
+  'ketal.waiting_for_more_players': { en: 'Waiting for more players...', fr: 'En attente de plus de joueurs...' },
+  'ketal.start_game': { en: 'Start Game', fr: 'Démarrer la partie' },
+  'ketal.need_more_players': { en: 'Need more players', fr: 'Plus de joueurs requis' },
+  'ketal.host_starts_game': { en: 'The host will start the game when ready.', fr: 'L\'hôte démarrera la partie quand il sera prêt.' },
+  
+  // Phase 1
+  'ketal.phase1': { en: 'Phase 1: Loading', fr: 'Phase 1 : Chargement' },
+  'ketal.round': { en: 'Round', fr: 'Tour' },
+  'ketal.turn1_title': { en: 'Red or Black?', fr: 'Rouge ou Noir ?' },
+  'ketal.turn2_title': { en: 'Higher or Lower?', fr: 'Plus ou Moins ?' },
+  'ketal.turn3_title': { en: 'Inside or Outside?', fr: 'Intérieur ou Extérieur ?' },
+  'ketal.turn4_title': { en: 'Which Suit?', fr: 'Quelle couleur ?' },
+  'ketal.red': { en: 'Red', fr: 'Rouge' },
+  'ketal.black': { en: 'Black', fr: 'Noir' },
+  'ketal.higher': { en: 'Higher', fr: 'Plus' },
+  'ketal.lower': { en: 'Lower', fr: 'Moins' },
+  'ketal.inside': { en: 'Inside', fr: 'Intérieur' },
+  'ketal.outside': { en: 'Outside', fr: 'Extérieur' },
+  'ketal.make_prediction': { en: 'Make your prediction!', fr: 'Fais ta prédiction !' },
+  'ketal.your_turn': { en: 'Your turn!', fr: 'À toi !' },
+  'ketal.deal_card': { en: 'Deal Card', fr: 'Distribuer' },
+  'ketal.deal_card_for': { en: 'Deal card for {0}', fr: 'Distribuer pour {0}' },
+  'ketal.waiting_for_host': { en: 'Waiting for host to deal...', fr: 'En attente de distribution...' },
+  'ketal.waiting_for_player': { en: 'Waiting for {0}...', fr: 'En attente de {0}...' },
+  'ketal.deck_remaining': { en: 'Cards remaining', fr: 'Cartes restantes' },
+  
+  // Phase 2 - Pyramid
+  'ketal.phase2': { en: 'Phase 2: Pyramid', fr: 'Phase 2 : Pyramide' },
+  'ketal.step': { en: 'Step', fr: 'Étape' },
+  'ketal.pyramid_complete': { en: 'Pyramid Complete!', fr: 'Pyramide terminée !' },
+  'ketal.drink': { en: 'Drink', fr: 'Boit' },
+  'ketal.give': { en: 'Give', fr: 'Donne' },
+  'ketal.reveal_next_card': { en: 'Reveal Next Card', fr: 'Révéler la carte suivante' },
+  'ketal.game_complete': { en: 'Game Complete!', fr: 'Partie terminée !' },
+  'ketal.player_cards': { en: 'Player Cards', fr: 'Cartes des joueurs' },
+  
+  // Sips
+  'ketal.sip': { en: 'sip', fr: 'gorgée' },
+  'ketal.sips': { en: 'sips', fr: 'gorgées' },
+  'ketal.distribute_sips': { en: 'Distribute Sips', fr: 'Distribuer les gorgées' },
+  'ketal.sip_to_give': { en: 'sip to give', fr: 'gorgée à donner' },
+  'ketal.sips_to_give': { en: 'sips to give', fr: 'gorgées à donner' },
+  'ketal.remaining': { en: 'Remaining', fr: 'Restant' },
+  'ketal.confirm': { en: 'Confirm', fr: 'Confirmer' },
+  'ketal.to_give': { en: 'to give', fr: 'à donner' },
+  'ketal.drink_up': { en: 'Drink up', fr: 'Bois' },
+  'ketal.understood': { en: 'Got it!', fr: 'Compris !' },
+  
+  // Stats
+  'ketal.you_drank': { en: 'You drank', fr: 'Tu as bu' },
+  'ketal.you_gave': { en: 'You gave', fr: 'Tu as donné' },
+  'ketal.top_drinker': { en: 'Top Drinker', fr: 'Plus gros buveur' },
+  'ketal.top_giver': { en: 'Top Giver', fr: 'Plus généreux' },
+  'ketal.all_players': { en: 'All Players', fr: 'Tous les joueurs' },
+  'ketal.history': { en: 'History', fr: 'Historique' },
+  'ketal.no_history': { en: 'No drink history yet.', fr: 'Pas encore d\'historique.' },
+  'ketal.drank': { en: 'drank', fr: 'a bu' },
+  
+  // Game end
+  'ketal.game_over': { en: 'Game Over!', fr: 'Partie terminée !' },
+  'ketal.thanks_for_playing': { en: 'Thanks for playing Ketal!', fr: 'Merci d\'avoir joué à Ketal !' },
+  'ketal.view_history': { en: 'View History', fr: 'Voir l\'historique' },
+  'ketal.play_again': { en: 'Play Again', fr: 'Rejouer' },
+  
+  // Errors
+  'ketal.errors.not_enough_players': { en: 'Not enough players to start', fr: 'Pas assez de joueurs pour commencer' },
+  'ketal.errors.empty_deck': { en: 'The deck is empty!', fr: 'Le paquet est vide !' },
+  'ketal.errors.pyramid_not_ready': { en: 'Pyramid phase not ready', fr: 'La phase pyramide n\'est pas prête' },
+  
+  // Reasons
+  'ketal.reasons.duplicate': { en: 'Duplicate on turn {turn}', fr: 'Doublon au tour {turn}' },
+  'ketal.reasons.missed': { en: 'Missed prediction on turn {turn}', fr: 'Prédiction ratée au tour {turn}' },
+  'ketal.reasons.correct': { en: 'Correct prediction on turn {turn}', fr: 'Prédiction correcte au tour {turn}' },
+  'ketal.reasons.pyramid_drink': { en: 'Pyramid: matched {value} ({amount} sips)', fr: 'Pyramide : {value} correspondant ({amount} gorgées)' },
+  'ketal.reasons.pyramid_give': { en: 'Pyramid: matched {value} ({amount} sips to give)', fr: 'Pyramide : {value} correspondant ({amount} gorgées à donner)' },
 }
 
 type LanguageContextType = {
